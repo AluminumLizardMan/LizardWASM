@@ -28,6 +28,7 @@ static const int screenWidth = 1280;
 static const int screenHeight = 720;
 static RenderTexture2D target = { 0 };
 
+Texture2D LOGO;
 
 void UpdateGame(void)
 {
@@ -73,6 +74,7 @@ void UpdateGame(void)
     EndTextureMode();
     
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+        DrawTexture(LOGO, 150, 0, WHITE);
 
         if (IsKeyDown(KEY_F))
         {
@@ -82,6 +84,7 @@ void UpdateGame(void)
         {
             DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, BLUE);
         }
+        DrawFPS(32, GetScreenHeight() - 32);
 
     EndDrawing();
 }
@@ -94,7 +97,7 @@ int main(void)
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     InitLizardFreeCam(70.0f);
-
+    LOGO = LoadTexture("resources/logo.png");
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateGame, 60, 1);
