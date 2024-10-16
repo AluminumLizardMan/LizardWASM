@@ -54,7 +54,7 @@ enum CameraMode
     LockedMode,
 };
 
-inline void InitLizardFreeCam(float fovy)
+void InitLizardFreeCam(float fovy)
 {
     ViewCam.fovy = fovy;
     ViewCam.projection = CAMERA_PERSPECTIVE;
@@ -64,7 +64,7 @@ inline void InitLizardFreeCam(float fovy)
     LastMousePos = GetMousePosition(); 
 }
 
-inline void UpdateLizardFreeCam(int MODE, Vector3 POS)
+void UpdateLizardFreeCam(int MODE, Vector3 POS)
 {
     previousCameraPosition = ViewCam.position;
     static float pitch = 0.0f;

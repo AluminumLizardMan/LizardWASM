@@ -41,8 +41,7 @@ static const int screenHeight = 720;
 
 static RenderTexture2D target = { 0 };
 
-static void UpdateDrawFrame(void);     
-
+static void UpdateDrawFrame(void);
 
 
 int main(void)
