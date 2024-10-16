@@ -126,6 +126,7 @@ void UpdateDrawFrame(void)
         
         // TODO: Draw your game screen here
         DrawRectangle(10, 10, screenWidth - 20, screenHeight - 20, SKYBLUE);
+        DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, RED);
         
     EndTextureMode();
     
