@@ -89,11 +89,47 @@ int main(void)
 // Update and draw frame
 void UpdateDrawFrame(void)
 {
-    
+    UpdateLizardFreeCam(EditMode, Vector3Zero());
+
+    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    {
+        LastMousePos = (Vector2){ GetScreenWidth() / 2, GetScreenHeight() / 2 };
+        SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
+        DisableCursor();
+    }
+    if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+    {
+        SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
+        EnableCursor();
+    }
+
     BeginTextureMode(target);
         ClearBackground(RAYWHITE);
-        
-        DrawRectangle(10, 10, screenWidth - 20, screenHeight - 20, SKYBLUE);
+
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        BeginMode3D(ViewCam);
+
+        DrawCube(Vector3Zero(), 2.0f, 2.0f, 2.0f, RED);
+        DrawCubeWires(Vector3Zero(), 2.0f, 2.0f, 2.0f, MAROON);
+
+        DrawGrid(10, 1.0f);
+
+        EndMode3D();
+
+        DrawRectangle(10, 10, 320, 93, Fade(SKYBLUE, 0.5f));
+        DrawRectangleLines(10, 10, 320, 93, BLUE);
+
+        DrawText("Free camera default controls:", 20, 20, 10, BLACK);
+        DrawText("- Mouse Wheel to Zoom in-out", 40, 40, 10, DARKGRAY);
+        DrawText("- Mouse Wheel Pressed to Pan", 40, 60, 10, DARKGRAY);
+        DrawText("- Z to zoom to (0, 0, 0)", 40, 80, 10, DARKGRAY);
+
+    EndTextureMode();
+    
+        DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
+
         if (IsKeyDown(KEY_F))
         {
             DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, RED);
@@ -102,20 +138,6 @@ void UpdateDrawFrame(void)
         {
             DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, BLUE);
         }
-        // TODO: Draw your game screen here
-        
-        
-        
-    EndTextureMode();
-    
-    // Render to screen (main framebuffer)
-    BeginDrawing();
-        ClearBackground(RAYWHITE);
-        
-        // Draw render texture to screen, scaled if required
-        DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
-
-        // TODO: Draw everything that requires to be drawn at this point, maybe UI?
 
     EndDrawing();
     //----------------------------------------------------------------------------------  
