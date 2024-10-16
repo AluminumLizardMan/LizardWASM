@@ -33,16 +33,18 @@ void UpdateGame(void)
 {
     UpdateLizardFreeCam(EditMode, Vector3Zero());
 
-    if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
     {
         LastMousePos = (Vector2){ GetScreenWidth() / 2, GetScreenHeight() / 2 };
+        HideCursor();
         SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
-        DisableCursor();
+        //DisableCursor();
     }
     if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
     {
         SetMousePosition(GetScreenWidth() / 2, GetScreenHeight() / 2);
-        EnableCursor();
+        //EnableCursor();
+        ShowCursor();
     }
 
     BeginTextureMode(target);
