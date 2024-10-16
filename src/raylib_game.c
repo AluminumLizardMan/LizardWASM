@@ -41,52 +41,8 @@ static const int screenHeight = 720;
 
 static RenderTexture2D target = { 0 };
 
-static void UpdateDrawFrame(void);
 
-
-int main(void)
-{
-#if !defined(_DEBUG)
-    SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messages
-#endif
-    
-    InitWindow(screenWidth, screenHeight, "raylib gamejam template");
-    
-    target = LoadRenderTexture(screenWidth, screenHeight);
-    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
-    InitLizardFreeCam(70.0f);
-
-
-#if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
-#else
-    SetTargetFPS(60);     // Set our game frames-per-second
-    //--------------------------------------------------------------------------------------
-    
-    // Main game loop
-    while (!WindowShouldClose())    // Detect window close button
-    {
-        UpdateDrawFrame();
-    }
-#endif
-
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
-    UnloadRenderTexture(target);
-    
-    // TODO: Unload all loaded resources at this point
-
-    CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
-
-    return 0;
-}
-
-//--------------------------------------------------------------------------------------------
-// Module functions definition
-//--------------------------------------------------------------------------------------------
-// Update and draw frame
-void UpdateDrawFrame(void)
+void UpdateGame(void)
 {
     UpdateLizardFreeCam(EditMode, Vector3Zero());
 
@@ -140,4 +96,44 @@ void UpdateDrawFrame(void)
 
     EndDrawing();
     //----------------------------------------------------------------------------------  
+}
+
+
+
+int main(void)
+{
+#if !defined(_DEBUG)
+    SetTraceLogLevel(LOG_NONE);         // Disable raylib trace log messages
+#endif
+
+    InitWindow(screenWidth, screenHeight, "raylib gamejam template");
+
+    target = LoadRenderTexture(screenWidth, screenHeight);
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    InitLizardFreeCam(70.0f);
+
+
+#if defined(PLATFORM_WEB)
+    emscripten_set_main_loop(UpdateGame, 60, 1);
+#else
+    SetTargetFPS(60);     // Set our game frames-per-second
+    //--------------------------------------------------------------------------------------
+
+    // Main game loop
+    while (!WindowShouldClose())    // Detect window close button
+    {
+        UpdateGame();
+    }
+#endif
+
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+    UnloadRenderTexture(target);
+
+    // TODO: Unload all loaded resources at this point
+
+    CloseWindow();        // Close window and OpenGL context
+    //--------------------------------------------------------------------------------------
+
+    return 0;
 }
