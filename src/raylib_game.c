@@ -12,6 +12,7 @@
 ********************************************************************************************/
 
 #include "raylib.h"
+#include "LizardFreeCamera.h"
 
 #if defined(PLATFORM_WEB)
     #define CUSTOM_MODAL_DIALOGS            // Force custom modal dialogs usage
@@ -34,36 +35,16 @@
     #define LOG(...)
 #endif
 
-//----------------------------------------------------------------------------------
-// Types and Structures Definition
-//----------------------------------------------------------------------------------
-typedef enum { 
-    SCREEN_LOGO = 0, 
-    SCREEN_TITLE, 
-    SCREEN_GAMEPLAY, 
-    SCREEN_ENDING
-} GameScreen;
 
-// TODO: Define your custom data types here
-
-//----------------------------------------------------------------------------------
-// Global Variables Definition
-//----------------------------------------------------------------------------------
 static const int screenWidth = 1280;
 static const int screenHeight = 720;
 
-static RenderTexture2D target = { 0 };  // Render texture to render our game
+static RenderTexture2D target = { 0 };
 
-// TODO: Define global variables here, recommended to make them static
+static void UpdateDrawFrame(void);     
 
-//----------------------------------------------------------------------------------
-// Module Functions Declaration
-//----------------------------------------------------------------------------------
-static void UpdateDrawFrame(void);      // Update and Draw one frame
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
+
 int main(void)
 {
 #if !defined(_DEBUG)
@@ -80,7 +61,7 @@ int main(void)
 #else
     SetTargetFPS(60);     // Set our game frames-per-second
     //--------------------------------------------------------------------------------------
-
+    InitLizardFreeCam(70.0f);
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button
     {
