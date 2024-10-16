@@ -55,13 +55,15 @@ int main(void)
     
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    InitLizardFreeCam(70.0f);
+
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateDrawFrame, 60, 1);
 #else
     SetTargetFPS(60);     // Set our game frames-per-second
     //--------------------------------------------------------------------------------------
-    InitLizardFreeCam(70.0f);
+    
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button
     {
@@ -87,15 +89,7 @@ int main(void)
 // Update and draw frame
 void UpdateDrawFrame(void)
 {
-    // Update
-    //----------------------------------------------------------------------------------
-    // TODO: Update variables / Implement example logic at this point
-    //----------------------------------------------------------------------------------
-
-    // Draw
-    //----------------------------------------------------------------------------------
-    // Render game screen to a texture, 
-    // it could be useful for scaling or further shader postprocessing
+    
     BeginTextureMode(target);
         ClearBackground(RAYWHITE);
         
