@@ -507,7 +507,7 @@ int main(void)
     BLOCKS = LoadTexture("resources/blocks.png");
     InitChunks();
 
-    RLAPI rlDisableBackfaceCulling();
+    rlDisableBackfaceCulling();
 
 #if defined(PLATFORM_WEB)
     emscripten_set_main_loop(UpdateGame, 60, 1);
