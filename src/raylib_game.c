@@ -33,10 +33,9 @@ Texture2D LOGO;
 Texture2D BLOCKS;
 
 
-Shader 
+Shader pixelatedShader;
 
 #pragma region MINECRAFT
-
 bool ProceduralBlocks;
 //Chunk definitions
 #define CHUNK_SIZE 16  // Chunk size: 16x16x16 blocks
@@ -47,8 +46,6 @@ bool ProceduralBlocks;
 #define ATLAS_WIDTH 2 // Number of textures in a row
 #define ATLAS_HEIGHT 2 // Number of textures in a column
 #define BLOCK_TEXTURE_SIZE 0.5f // Size of each block texture (1 / 4 for 4x2 atlas)
-
-
 // Block types
 enum BlockType
 {
@@ -60,13 +57,10 @@ enum BlockType
     Water,
     BlockTypeCount // Use this to keep track of the number of block types
 };
-
-
 typedef struct
 {
     int type;  // 0 = air, 1 = solid block
 } Block;
-
 typedef struct {
     Block blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE]; // 3D array of blocks in the chunk
     Vector3 position; // World position of this chunk
@@ -76,43 +70,21 @@ typedef struct {
     Color chunkColor;
     bool meshNeedsUpdate; // Whether we need to rebuild the chunk's mesh
 } Chunk;
-
-
 Chunk worldChunks[WORLD_WIDTH][WORLD_DEPTH];
 
-Texture2D blocksTexture;
-
 // Scale factors
-float scale = 0.1f; // Adjust scale for the noise
-float heightScale = CHUNK_SIZE; // Maximum height for your terrain
-float islandFalloffFactor = 0.0f; // Factor to control the falloff (experiment with this value)
+float scale = CHUNK_SIZE; // Adjust scale for the noise
+float heightScale = 16; // Maximum height for your terrain
 // Define the center of the world
 int worldCenterX = (WORLD_WIDTH * CHUNK_SIZE) / 2;
 int worldCenterZ = (WORLD_DEPTH * CHUNK_SIZE) / 2;
-// Radial falloff function
-float GetRadialFalloff(int x, int z) {
-    float distanceX = x - worldCenterX;
-    float distanceZ = z - worldCenterZ;
-    float distance = sqrtf(distanceX * distanceX + distanceZ * distanceZ);
-
-    // Normalize the distance so that it goes from 1 in the center to 0 at the edges
-    float maxDistance = sqrtf((WORLD_WIDTH * CHUNK_SIZE / 2) * (WORLD_WIDTH * CHUNK_SIZE / 2) +
-        (WORLD_DEPTH * CHUNK_SIZE / 2) * (WORLD_DEPTH * CHUNK_SIZE / 2));
-    float falloff = 1.0f - (distance / maxDistance);
-
-    // Apply a falloff factor to control how steep the tapering is
-    falloff = powf(falloff, islandFalloffFactor); // Adjust this factor to control sharpness
-
-    return falloff;
-}
+Image perlinImage;
+Texture2D perlinTexture;
 // Get height using Perlin noise with island falloff
 float GetHeight(int x, int z) {
-    // Generate noise value; you can adjust the parameters for different results
-    float noiseValue = stb_perlin_noise3((float)x * scale, (float)z * scale, 0.0f, 4, 0.5f, 0.1f);
-
-    // Apply the radial falloff to the noise-based height
-    float falloff = GetRadialFalloff(x, z);
-    return noiseValue * falloff * heightScale; // Scale the height based on the falloff
+    Color HeightColor = GetImageColor(perlinImage, x, z);
+    float heightValue = (float)HeightColor.r / 255.0f;
+    return heightValue * heightScale;
 }
 // Function to check if a chunk is inside the camera's frustum
 bool IsChunkVisible(Camera3D camera, BoundingBox box)
@@ -209,12 +181,14 @@ void GenerateChunkMesh(Chunk* chunk) {
                         texcoords[vertexCount + 2] = (Vector2){ texCoord.x + BLOCK_TEXTURE_SIZE, texCoord.y + BLOCK_TEXTURE_SIZE };
                         texcoords[vertexCount + 3] = (Vector2){ texCoord.x + BLOCK_TEXTURE_SIZE, texCoord.y };
 
+                        
+
                         indices[indexCount + 0] = vertexCount + 0;
-                        indices[indexCount + 1] = vertexCount + 1;
-                        indices[indexCount + 2] = vertexCount + 2;
+                        indices[indexCount + 1] = vertexCount + 2;
+                        indices[indexCount + 2] = vertexCount + 1;
                         indices[indexCount + 3] = vertexCount + 0;
-                        indices[indexCount + 4] = vertexCount + 2;
-                        indices[indexCount + 5] = vertexCount + 3;
+                        indices[indexCount + 4] = vertexCount + 3;
+                        indices[indexCount + 5] = vertexCount + 2;
 
                         vertexCount += 4;
                         indexCount += 6;
@@ -233,11 +207,11 @@ void GenerateChunkMesh(Chunk* chunk) {
                         texcoords[vertexCount + 3] = (Vector2){ texCoord.x + BLOCK_TEXTURE_SIZE, texCoord.y };
 
                         indices[indexCount + 0] = vertexCount + 0;
-                        indices[indexCount + 1] = vertexCount + 2;
-                        indices[indexCount + 2] = vertexCount + 1;
+                        indices[indexCount + 1] = vertexCount + 1;
+                        indices[indexCount + 2] = vertexCount + 2;
                         indices[indexCount + 3] = vertexCount + 0;
-                        indices[indexCount + 4] = vertexCount + 3;
-                        indices[indexCount + 5] = vertexCount + 2;
+                        indices[indexCount + 4] = vertexCount + 2;
+                        indices[indexCount + 5] = vertexCount + 3;
 
                         vertexCount += 4;
                         indexCount += 6;
@@ -256,11 +230,11 @@ void GenerateChunkMesh(Chunk* chunk) {
                         texcoords[vertexCount + 3] = (Vector2){ texCoord.x, texCoord.y + BLOCK_TEXTURE_SIZE };
 
                         indices[indexCount + 0] = vertexCount + 0;
-                        indices[indexCount + 1] = vertexCount + 2;
-                        indices[indexCount + 2] = vertexCount + 1;
+                        indices[indexCount + 1] = vertexCount + 1;
+                        indices[indexCount + 2] = vertexCount + 2;
                         indices[indexCount + 3] = vertexCount + 0;
-                        indices[indexCount + 4] = vertexCount + 3;
-                        indices[indexCount + 5] = vertexCount + 2;
+                        indices[indexCount + 4] = vertexCount + 2;
+                        indices[indexCount + 5] = vertexCount + 3;
 
                         vertexCount += 4;
                         indexCount += 6;
@@ -347,7 +321,6 @@ void GenerateChunkMesh(Chunk* chunk) {
     MemFree(indices);
     chunk->meshNeedsUpdate = false;
 }
-
 // Function to draw all chunk meshes
 void DrawChunks(Camera3D camera)
 {
@@ -369,9 +342,11 @@ void DrawChunks(Camera3D camera)
         }
     }
 }
-
 // Function to initialize chunks with random block types
 void InitChunks() {
+
+    
+
     for (int x = 0; x < WORLD_WIDTH; x++) {
         for (int z = 0; z < WORLD_DEPTH; z++) {
 
@@ -432,9 +407,6 @@ void InitChunks() {
 }
 #pragma endregion
 
-
-
-
 //Main gametick function.
 void UpdateGame(void)
 {
@@ -463,9 +435,8 @@ void UpdateGame(void)
 
         BeginMode3D(ViewCam);
 
-        //DrawGrid(10, 1.0f);
-
         DrawChunks(ViewCam);
+
 
         EndMode3D();
 
@@ -482,15 +453,15 @@ void UpdateGame(void)
         DrawTexturePro(target.texture, (Rectangle){ 0, 0, (float)target.texture.width, -(float)target.texture.height }, (Rectangle){ 0, 0, (float)target.texture.width, (float)target.texture.height }, (Vector2){ 0, 0 }, 0.0f, WHITE);
       //  DrawTexture(LOGO, 150, 0, WHITE);
 
-        if (IsKeyDown(KEY_F))
+       /* if (IsKeyDown(KEY_F))
         {
             DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, RED);
         }
         else
         {
             DrawText("Hopefully it works - Lizard, 2024", GetScreenWidth() / 2, GetScreenHeight() / 2, 20, BLUE);
-        }
-        DrawFPS(32, GetScreenHeight() - 32);
+        }*/
+        DrawFPS(16, GetScreenHeight() - 32);
 
     EndDrawing();
 }
@@ -498,26 +469,26 @@ void UpdateGame(void)
 //Entry point 
 int main(void)
 {
-    
     InitWindow(screenWidth, screenHeight, "raylib gamejam template");
     target = LoadRenderTexture(screenWidth, screenHeight);
     SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
     InitLizardFreeCam(70.0f);
     LOGO = LoadTexture("resources/logo.png");
     BLOCKS = LoadTexture("resources/blocks.png");
+    perlinImage = GenImagePerlinNoise(CHUNK_SIZE * WORLD_WIDTH, CHUNK_SIZE * WORLD_WIDTH, 0.0f , 0.0f, 1.5f);
+    perlinTexture = LoadTextureFromImage(perlinImage);
+
     InitChunks();
 
-    rlDisableBackfaceCulling();
-
-#if defined(PLATFORM_WEB)
-    emscripten_set_main_loop(UpdateGame, 60, 1);
-#else
+    #if defined(PLATFORM_WEB)
+        emscripten_set_main_loop(UpdateGame, 60, 1);
+    #else
     SetTargetFPS(60);     
     while (!WindowShouldClose())
     {
         UpdateGame();
     }
-#endif
+    #endif
 
     UnloadRenderTexture(target);
     CloseWindow();
